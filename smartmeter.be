@@ -57,10 +57,8 @@ class SmlSerial
     end
     tl_len -= 1 # subtract tl byte
 
-    #TODO: throw/catch exception and stop parsing in this case?
     if (tl_len < 0)
-      print("SML: Something went wrong, len < 0...")
-      return 0
+      raise 'parse_error', 'len of element < 0'
     end
 
     if (tl_type == 0x70)
@@ -75,7 +73,9 @@ class SmlSerial
           val = self.read_buf.get(self.read_index, -tl_len)
         end
       else
-        assert(tl_len == 8)
+        if (tl_len != 8)
+          raise 'parse_error', 'len on int64 != 8'
+        end
         val = int64()
         val.frombytes(self.read_buf[self.read_index..self.read_index+7].reverse(), 0)
       end
@@ -104,7 +104,7 @@ class Smartmeter
 
   def every_second()
     self.trigger_count += 1
-    if (self.trigger_count % 30 == 0)
+    if (self.trigger_count % 15 == 0)
         self.values = {}
         self.parse_sml()
         self.trigger_count = 0
@@ -140,6 +140,9 @@ class Smartmeter
       self.sml_buf.parse_get_val() # ignore time
       var unit = self.units.find(self.sml_buf.parse_get_val())
       var scaler = self.sml_buf.parse_get_val()
+      if (scaler > 0 || scaler < -3)
+        raise 'parse_error', 'invalid scaler'
+      end
       var value = self.sml_buf.parse_get_val()
       self.sml_buf.parse_get_val() # ignore signature
       if (unit)
@@ -168,29 +171,34 @@ class Smartmeter
     self.state = 0
 
     var wait_count = 0
-    while (wait_count < 50)
-      if (self.sml_buf.read_buf.size() < 100)
-        if (!self.sml_buf.read_data())
-          tasmota.delay(50)
-          wait_count += 1
-        end
-        continue
-      end        
+    try
+      while (wait_count < 50)
+        if (self.sml_buf.read_buf.size() < 100)
+          if (!self.sml_buf.read_data())
+            tasmota.delay(50)
+            wait_count += 1
+          end
+          continue
+        end        
 
-      if (self.state == 0)
-        while ((self.state == 0) && (self.sml_buf.read_buf.size() >= 8))
-          self.parse_start_symbol()
+        if (self.state == 0)
+          while ((self.state == 0) && (self.sml_buf.read_buf.size() >= 8))
+            self.parse_start_symbol()
+          end
+        elif (self.state == 1)
+          self.parse_values()
+        else # state == 2 => end symbol detected
+          assert(self.state == 2)
+          print("SML: Finished parsing")
+          return
         end
-      elif (self.state == 1)
-        self.parse_values()
-      else # state == 2 => end symbol detected
-        assert(self.state == 2)
-        print("SML: Finished parsing")
-        return
       end
+      print("SML: Timeout parsing")
+      print("SML: Discarding buffer: " + self.sml_buf.read_buf.tohex())
+    except 'parse_error' as e, msg
+      print("SML: Parse error - "..msg)
+      self.values = {} # discard all values in this case
     end
-    print("SML: Timeout parsing")
-    print("SML: Discarding buffer: " + self.sml_buf.read_buf.tohex())
   end
 end
   
