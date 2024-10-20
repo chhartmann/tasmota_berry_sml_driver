@@ -6,8 +6,9 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"berry.berry"
-			]
+                "berry.berry",
+                "actboy168.tasks"
+            ]
 		}
 	}
 }

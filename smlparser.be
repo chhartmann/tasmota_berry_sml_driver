@@ -157,8 +157,12 @@ class SmlParser
     self.parse_buf = data
     self.values = {}
     if (self.extract_telegram() && self.verify_crc())
-      self.parse_telegram()
-      return true
+      try
+        self.parse_telegram()
+        return true
+      except ..
+      end
+      return false      
     else
       return false
     end
