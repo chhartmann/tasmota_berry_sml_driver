@@ -1,0 +1,10 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run SML test in simulation",
+            "type": "shell",
+            "command": "/berry/berry /workspaces/tasmota_berry_sml_driver/smlparser_test.be"
+        }
+    ]
+}
