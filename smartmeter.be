@@ -24,6 +24,8 @@ class Smartmeter
     if (self.ser.available() > 0)
       self.read_buf += self.ser.read()
       if (self.read_buf.size() > 1500)
+        tasmota.log(self.read_buf.tohex())
+        tasmota.log(str(tasmota.memory()))
         if (self.lock_parse_buf == false)
           self.lock_parse_buf = true
           self.parse_buf = self.read_buf.copy()

@@ -18,10 +18,9 @@ class SmlParser
     if (l <= 4)
       r = self.parse_buf.geti(0, -l)
     else
-      r = int64()
-      r.frombytes(self.parse_buf[0..7].reverse(), 0)
+      r = int64.frombytes(self.parse_buf[0..7].reverse(), 0)
     end
-#    print("int: " + str(r) + " " + self.parse_buf[0..l-1].tohex())
+    print("int: " + str(r) + " " + self.parse_buf[0..l-1].tohex())
     self.parse_buf = self.parse_buf[l..]
     return r
   end
@@ -31,10 +30,9 @@ class SmlParser
     if (l <= 4)
       r = self.parse_buf.get(0, -l)
     else
-      r = int64()
-      r.frombytes(self.parse_buf[0..7].reverse(), 0)
+      r = int64.frombytes(self.parse_buf[0..7].reverse(), 0)
     end
-#    print("uint: " + str(r) + " " + self.parse_buf[0..l-1].tohex())
+    print("uint: " + str(r) + " " + self.parse_buf[0..l-1].tohex())
     self.parse_buf = self.parse_buf[l..]
     return r
   end
@@ -72,7 +70,7 @@ class SmlParser
       return 0 # ignore list field
     end
 
-#    print("type 0x" + string.hex(tl_type) + " len " + str(tl_len))
+    print("type 0x" + string.hex(tl_type) + " len " + str(tl_len))
     
     if (tl_type == 0x60)
       val = self.pop_uint(tl_len)
@@ -139,7 +137,7 @@ class SmlParser
         self.parse_get_val() # ignore time
         var unit = self.units.find(self.parse_get_val())
         var scaler = self.parse_get_val()
-        var value = self.parse_get_val()        
+        var value = self.parse_get_val()
         self.parse_get_val() # ignore signature
         if (unit)
           var obis_str = string.format("%d-%d:%d.%d.%d*%d", obis_code[0], obis_code[1], obis_code[2], obis_code[3], obis_code[4], obis_code[5])
