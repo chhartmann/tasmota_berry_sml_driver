@@ -20,7 +20,7 @@ class SmlParser
     else
       r = int64.frombytes(self.parse_buf[0..7].reverse(), 0)
     end
-    print("int: " + str(r) + " " + self.parse_buf[0..l-1].tohex())
+#    print("int: " + str(r) + " " + self.parse_buf[0..l-1].tohex())
     self.parse_buf = self.parse_buf[l..]
     return r
   end
@@ -32,7 +32,7 @@ class SmlParser
     else
       r = int64.frombytes(self.parse_buf[0..7].reverse(), 0)
     end
-    print("uint: " + str(r) + " " + self.parse_buf[0..l-1].tohex())
+#    print("uint: " + str(r) + " " + self.parse_buf[0..l-1].tohex())
     self.parse_buf = self.parse_buf[l..]
     return r
   end
@@ -70,7 +70,7 @@ class SmlParser
       return 0 # ignore list field
     end
 
-    print("type 0x" + string.hex(tl_type) + " len " + str(tl_len))
+#    print("type 0x" + string.hex(tl_type) + " len " + str(tl_len))
     
     if (tl_type == 0x60)
       val = self.pop_uint(tl_len)
